@@ -59,9 +59,8 @@ const Veriff = (options: Options) => {
     return form;
   }
 
-  function updateParams(newParams: Params, mountOptions: MountOptions = {}, frame: CreationFrameOptions): void {
+  function updateParams(newParams: Params, mountOptions: MountOptions = {}): void {
     params = { ...newParams };
-    frameOptions = frame;
     const { formLabel, loadingText, submitBtnText } = mountOptions;
     const form = createTemplate(parentId, { ...newParams, formLabel, submitBtnText });
     veriffForm = assignSubmit(form, loadingText, submitBtnText);
