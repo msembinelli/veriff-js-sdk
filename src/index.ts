@@ -1,6 +1,7 @@
 import './styles/style.css';
 import { createTemplate, PersonData, FormLabel } from './template';
 import { createSession } from './xhr';
+import { createVeriffFrame, CreationFrameOptions } from './frame';
 
 interface Options {
   host?: string;
@@ -58,8 +59,9 @@ const Veriff = (options: Options) => {
     return form;
   }
 
-  function updateParams(newParams: Params, mountOptions: MountOptions = {}): void {
+  function updateParams(newParams: Params, mountOptions: MountOptions = {}, frame: CreationFrameOptions): void {
     params = { ...newParams };
+    frameOptions = frame;
     const { formLabel, loadingText, submitBtnText } = mountOptions;
     const form = createTemplate(parentId, { ...newParams, formLabel, submitBtnText });
     veriffForm = assignSubmit(form, loadingText, submitBtnText);
@@ -77,11 +79,16 @@ const Veriff = (options: Options) => {
     veriffForm = assignSubmit(form, loadingText, submitBtnText);
   }
 
+  function createFrame(frameOptions: CreationFrameOptions) {
+    createVeriffFrame(frameOptions);
+  }
+
   return {
     params: params,
     setParams: setParams,
     updateParams: updateParams,
     mount: mount,
+    createVeriffFrame: createFrame,
   };
 };
 

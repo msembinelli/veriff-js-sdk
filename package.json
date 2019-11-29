@@ -71,5 +71,8 @@
     "webpack-merge": "^4.2.2",
     "yargs": "^11.1.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "body-scroll-lock": "^2.6.4",
+    "dom-focus-lock": "^1.0.4"
+  }
 }
