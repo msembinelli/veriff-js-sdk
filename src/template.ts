@@ -49,15 +49,6 @@ export function createInput(opts: InputCreationOptions) {
   return input;
 }
 
-export function createLabel(value, labelFor) {
-  const label = document.createElement('label');
-  label.setAttribute('class', `veriff-label`);
-  label.setAttribute('id', `veriff-label-${camelCaseToSlug(labelFor)}`);
-  label.setAttribute('htmlFor', labelFor);
-  label.innerHTML = value;
-  return label;
-}
-
 export interface CreationOptions {
   container: HTMLFormElement;
   name: string;
@@ -69,9 +60,7 @@ export interface CreationOptions {
 export function createInputIfNeeded(opts: CreationOptions) {
   const { container, name, label, shouldRender, required } = opts;
   if (shouldRender) {
-    const inputLabel = createLabel(label, name);
     const input = createInput({ type: 'text', name, label, required });
-    container.appendChild(inputLabel);
     container.appendChild(input);
   }
 }

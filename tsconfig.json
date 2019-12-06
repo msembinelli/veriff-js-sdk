@@ -5,11 +5,13 @@
     "module": "commonjs",
     "target": "es5",
     "lib": ["es2015", "es2017", "dom"],
-    "declaration": true
+    "declaration": true,
+    "moduleResolution": "node",
+    // Import non-ES modules as default imports.
+    "esModuleInterop": true
   },
   "include": [
-    "./src/**/*",
-    "./test/**/*"
+    "./src/**/*"
   ],
   "exclude": [
     "node_modules"

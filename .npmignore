@@ -3,3 +3,5 @@ src
 test
 node_modules
 webpack.config.js
+tsconfig.json
+.eslintrc.json
