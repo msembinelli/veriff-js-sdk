@@ -1,82 +1,96 @@
-import { createTemplate, PersonData, FormLabel } from './template';
+import { createTemplate } from './template';
 import { createSession } from './xhr';
 
-export interface Options {
-  host?: string;
-  apiKey: string;
-  parentId: string;
-  onSession: (err, response) => void;
+export interface FormLabel {
+  [P: string]: string;
 }
 
-export interface MountOptions {
+export interface PersonData {
+  givenName?: string;
+  lastName?: string;
+  idNumber?: string;
+}
+
+export interface TemplateOptions {
+  parentId?: string;
+  person?: PersonData;
   formLabel?: FormLabel;
   submitBtnText?: string;
-  loadingText?: string;
-}
-
-export interface Params {
-  person?: PersonData;
   vendorData?: string;
 }
 
-export function Veriff(options: Options) {
-  const { host = 'https://api.veriff.me', apiKey, parentId, onSession } = options;
-  const onSessionCallback = onSession;
-  let mountedOptions: MountOptions = { loadingText: 'Loading...', submitBtnText: 'Start Verification' };
-  let params: Params = {
-    person: {},
-  };
-  let veriffForm: HTMLFormElement;
+export interface Options extends TemplateOptions {
+  host?: string;
+  apiKey?: string;
+  onSession?: (err, response) => void;
+  loadingText?: string;
+}
 
-  function setParams(newParams: Params): void {
-    params = { ...params, ...newParams };
-  }
+const DEFAULT_OPTIONS: Options = {
+  host: 'https://api.veriff.me',
+  parentId: 'veriff-root',
+  loadingText: 'Loading...',
+  submitBtnText: 'Start Verification',
+  formLabel: {
+    givenName: 'Given name',
+    lastName: 'Last name',
+    idNumber: 'Id number',
+    vendorData: 'Data',
+  },
+  person: {
+    givenName: '',
+    lastName: '',
+    idNumber: '',
+  },
+};
 
-  function assignSubmit(form, loadingText = 'Loading...', submitBtnText): HTMLFormElement {
-    form.onsubmit = (e) => {
-      e.preventDefault();
+export function Veriff(options: Options = DEFAULT_OPTIONS) {
+  const veriffOptions = options;
 
-      const givenName = veriffForm.givenName?.value || params.person.givenName;
-      const lastName = veriffForm.lastName?.value || params.person.lastName;
-      const idNumber = params.person?.idNumber;
-      const vendorData =
-        typeof veriffForm.vendorData?.value === 'string' ? veriffForm.vendorData?.value : params.vendorData;
-
-      if (!givenName || !lastName) {
-        throw new Error('Required parameters givenName or lastName is missing');
-      }
-
-      setParams({ person: { givenName, lastName, idNumber }, vendorData });
-      form.submitBtn.value = loadingText;
-      form.submitBtn.disabled = true;
-      createSession(host, apiKey, params, (err, response) => {
-        if (onSessionCallback) {
-          onSessionCallback(err, response);
-        }
-        form.submitBtn.value = submitBtnText;
-        form.submitBtn.disabled = false;
-      });
-    };
-
-    return form;
-  }
-
-  function mount(mountOptions: MountOptions = {}): void {
-    mountedOptions = { ...mountedOptions, ...mountOptions };
-    const { formLabel, loadingText, submitBtnText } = mountedOptions;
-    const { person, vendorData } = params;
-    const form = createTemplate(parentId, {
+  function mount(): void {
+    const {
+      parentId,
+      person,
+      vendorData,
+      formLabel,
+      submitBtnText,
+      loadingText,
+      host,
+      apiKey,
+      onSession,
+    } = veriffOptions;
+    const form = createTemplate(<TemplateOptions>{
+      parentId,
       person,
       vendorData,
       formLabel,
       submitBtnText,
     });
 
-    veriffForm = assignSubmit(form, loadingText, submitBtnText);
+    form.onsubmit = (e) => {
+      e.preventDefault();
+
+      const givenName = form.givenName?.value || person.givenName;
+      const lastName = form.lastName?.value || person.lastName;
+      const data = typeof form.vendorData?.value === 'string' ? form.vendorData?.value : vendorData;
+
+      if (!givenName || !lastName) {
+        throw new Error('Required parameters givenName or lastName is missing');
+      }
+
+      form.submitBtn.value = loadingText;
+      form.submitBtn.disabled = true;
+      createSession(host, apiKey, person, data, (err, response) => {
+        if (onSession) {
+          onSession(err, response);
+        }
+        form.submitBtn.value = submitBtnText;
+        form.submitBtn.disabled = false;
+      });
+    };
   }
 
   return {
-    params,
     mount,
   };
 }

@@ -1,11 +1,12 @@
-import { PersonData } from './template';
+import { PersonData } from './veriff';
 
 const CREATED_RESPONSE_STATUS = 201;
 
 export function createSession(
   host: string,
   apiKey: string,
-  data: { person?: PersonData; vendorData?: string },
+  person: PersonData,
+  data: string,
   cb: (statusObject, resp) => void
 ): void {
   const url = `${host}/v1/sessions`;
@@ -34,11 +35,11 @@ export function createSession(
   const body = {
     verification: {
       person: {
-        firstName: data.person.givenName,
-        lastName: data.person.lastName,
-        idNumber: data.person.idNumber,
+        firstName: person.givenName,
+        lastName: person.lastName,
+        idNumber: person.idNumber,
       },
-      vendorData: data.vendorData,
+      vendorData: data,
       timestamp: new Date().toISOString(),
     },
   };
